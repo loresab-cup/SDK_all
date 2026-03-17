@@ -6,7 +6,8 @@ import {
   Header,
   Footer,
   MainContent,
-  Documents
+  Documents,
+  Catalog
 } from '@components';
 
 
@@ -24,6 +25,7 @@ function App() {
           <Routes>
             <Route path="/" element={<MainContent />} />
             <Route path="/documents" element={<Documents />} />
+            <Route path="/catalog" element={<Catalog />} />
           </Routes>
           <Footer />
         </div>

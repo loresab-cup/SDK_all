@@ -312,3 +312,246 @@
         max-width: 280px;
     }
 }
+
+/* ================== Карусель ==================== */
+.callbackSlide {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    border-radius: 8px;
+}
+
+.callbackLeft {
+    flex: 1;
+}
+
+.callbackTitle {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    color: #333;
+}
+
+.callbackSubtitle {
+    font-size: 18px;
+    color: #666;
+    margin: 0;
+}
+
+.callbackForm {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 400px;
+}
+
+.callbackInput {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+.callbackInput:focus {
+    outline: none;
+    border-color: #925343;
+}
+
+.callbackButton {
+    padding: 14px 16px;
+    background-color: #925343;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.callbackButton:hover {
+    background-color: #7a4537;
+}
+
+/* Общие настройки для всех элементов карусели */
+.carousel *,
+.carousel *::before,
+.carousel *::after {
+    box-sizing: border-box;
+}
+
+.slidesContainer {
+    position: relative;
+    height: 400px;
+    margin-bottom: 30px;
+}
+
+/* Слайды: неактивные не должны перехватывать клики */
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* Форма обратного звонка */
+.callbackSlide {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    background: #F2E5D7;
+    border-radius: 8px;
+}
+
+.callbackLeft {
+    flex: 1;
+}
+
+.callbackTitle {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    color: #333;
+}
+
+.callbackSubtitle {
+    font-size: 18px;
+    color: #666;
+    margin: 0;
+}
+
+.callbackForm {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 400px;
+    width: 100%;
+}
+
+.callbackInput {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+    height: 52px;
+    /* фиксированная высота, совпадает с кнопкой */
+}
+
+.callbackInput:focus {
+    outline: none;
+    border-color: #925343;
+}
+
+.callbackButton {
+    width: 100%;
+    padding: 14px 16px;
+    background-color: #925343;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    height: 52px;
+    /* одинаковая высота с инпутами */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.callbackButton:hover {
+    background-color: #7a4537;
+}
+
+/* Заглушка для остальных слайдов */
+.placeholderSlide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: white;
+    color: #999;
+    font-size: 24px;
+}
+
+/* Адаптивность для планшетов и мобильных */
+@media (max-width: 768px) {
+    .slidesContainer {
+        height: 450px;
+        /* чуть больше для вертикальной компоновки */
+    }
+
+    .callbackSlide {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 20px;
+        padding: 30px 20px;
+    }
+
+    .callbackLeft {
+        text-align: center;
+    }
+
+    .callbackForm {
+        max-width: 100%;
+    }
+
+    .callbackTitle {
+        font-size: 28px;
+    }
+
+    .callbackSubtitle {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slidesContainer {
+        height: 500px;
+    }
+
+    .callbackSlide {
+        padding: 20px 15px;
+    }
+
+    .callbackTitle {
+        font-size: 24px;
+    }
+
+    .callbackInput,
+    .callbackButton {
+        height: 48px;
+        /* чуть меньше на маленьких экранах */
+    }
+}

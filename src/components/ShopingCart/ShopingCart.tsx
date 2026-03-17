@@ -7,7 +7,8 @@ const ShopingCart: React.FC<ShopingCartProps> = ({
     onClose,
     items = [],
     onUpdateQuantity,
-    onRemoveItem
+    onRemoveItem,
+    onCheckout
 }) => {
     const handleIncreaseQuantity = (id: string) => {
         const item = items.find(item => item.id === id);
@@ -138,7 +139,10 @@ const ShopingCart: React.FC<ShopingCartProps> = ({
                                     </div>
                                 </div>
 
-                                <button className={styles.checkoutButton}>
+                                <button
+                                    className={styles.checkoutButton}
+                                    onClick={onCheckout}
+                                >
                                     Оформить заказ
                                 </button>
 

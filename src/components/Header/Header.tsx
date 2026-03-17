@@ -7,6 +7,7 @@ import logo from '@assets/logo.png';
 import shopIcon from '@assets/icons/shopIcon.png';
 import ShopingCart from '@components/ShopingCart';
 import { useCart } from '@contexts/CartContext';
+import { apiService } from '@services/api';
 
 const Header: React.FC = () => {
     const {
@@ -15,6 +16,7 @@ const Header: React.FC = () => {
         closeCart,
         updateQuantity,
         removeItem,
+        clearCart,
         getTotalItems
     } = useCart();
 
@@ -27,6 +29,26 @@ const Header: React.FC = () => {
     const closeMenu = () => {
         setIsMenuOpen(false);
     };
+
+    const handleCheckout = async () => {
+        if (!state.items.length) return;
+
+        try {
+            await apiService.createOrder({
+                client_name: 'Клиент',
+                client_surname: 'Без данных',
+                client_patronymic: '',
+                phone: '+70000000000',
+                email: '',
+                comment: 'Заказ без персональных данных'
+            });
+            clearCart();
+            closeCart();
+        } catch (err) {
+            console.error('Ошибка оформления заказа:', err);
+        }
+    };
+
 
     return (
         <>
@@ -113,6 +135,7 @@ const Header: React.FC = () => {
                         items={state.items}
                         onUpdateQuantity={updateQuantity}
                         onRemoveItem={removeItem}
+                        onCheckout={handleCheckout}
                     />
                 </div>
             </div>

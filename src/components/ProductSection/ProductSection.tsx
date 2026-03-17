@@ -30,11 +30,11 @@ const ProductSection: React.FC = () => {
     const fetchProducts = async () => {
         try {
             const data = await apiService.getProducts();
-            setProducts(data.data || data);
+            setProducts(data);
             setLoading(false);
         } catch (err) {
             console.error('Ошибка загрузки товаров:', err);
-            // Можно добавить retry логику
+
         }
     };
 
@@ -69,7 +69,7 @@ const ProductSection: React.FC = () => {
     };
 
     const handleQuantityChange = (variantId: string, newQuantity: number) => {
-        if (loading) return; // Блокируем изменения во время загрузки
+        if (loading) return;
         const variant = getAllVariants().find(v => v.id === variantId);
         if (variant && newQuantity >= 1 && newQuantity <= variant.stock) {
             setQuantities(prev => ({
@@ -84,7 +84,7 @@ const ProductSection: React.FC = () => {
     };
 
     const handleAddToCart = (product: Product) => {
-        if (loading) return; // Блокируем добавление в корзину во время загрузки
+        if (loading) return;
         const variantId = selectedVariants[product.id];
         if (!variantId) return;
 
@@ -110,7 +110,6 @@ const ProductSection: React.FC = () => {
         return quantities[variantId] || 1;
     };
 
-    // Всегда показываем скелетон пока loading = true
     if (loading) {
         return (
             <section className={styles.productSection}>

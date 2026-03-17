@@ -9,3 +9,5 @@ export { default as Footer } from './Footer';
 export { default as ShopingCart } from './ShopingCart';
 export { default as MainContent } from './MainContent';
 export { default as Documents } from './Documents';
+export { default as Catalog } from './Catalog';
+export { default as ProductCatalog } from './ProductCatalog';

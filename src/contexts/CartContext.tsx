@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, type ReactNode } from 'react';
 import type { CartItem, Product, ProductVariant } from '@types';
+import { apiService } from '@services/api';
 
 // Типы для действий (actions)
 type CartAction =
@@ -109,6 +110,10 @@ interface CartProviderProps {
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const [state, dispatch] = useReducer(cartReducer, initialState);
 
+    const syncItems = (items: CartItem[]) => {
+        dispatch({ type: 'SET_ITEMS', payload: items });
+    };
+
     // Функция для добавления товара
     const addItem = (product: Product, variant: ProductVariant, quantity: number) => {
         const cartItem: CartItem = {
@@ -126,6 +131,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         };
 
         dispatch({ type: 'ADD_ITEM', payload: cartItem });
+
+        apiService.addToCart(variant.id, quantity)
+            .then(syncItems)
+            .catch((err) => {
+                console.error('Ошибка добавления в корзину (сервер):', err);
+            });
     };
 
     // Функция для обновления количества
@@ -135,16 +146,34 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             return;
         }
         dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } });
+
+        apiService.updateCartItem(id, quantity)
+            .then(syncItems)
+            .catch((err) => {
+                console.error('Ошибка обновления корзины (сервер):', err);
+            });
     };
 
     // Функция для удаления товара
     const removeItem = (id: string) => {
         dispatch({ type: 'REMOVE_ITEM', payload: id });
+
+        apiService.removeCartItem(id)
+            .then(syncItems)
+            .catch((err) => {
+                console.error('Ошибка удаления из корзины (сервер):', err);
+            });
     };
 
     // Функция для очистки корзины
     const clearCart = () => {
         dispatch({ type: 'CLEAR_CART' });
+
+        apiService.clearCart()
+            .then(syncItems)
+            .catch((err) => {
+                console.error('Ошибка очистки корзины (сервер):', err);
+            });
     };
 
     // Функции для открытия/закрытия корзины
