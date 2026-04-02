@@ -1,0 +1,113 @@
+.phoneFixedButton {
+    position: fixed;
+    /* background: linear-gradient(135deg, #7B4538, #553026); */
+    background:#553026;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    animation: vibrate 2s infinite;
+    transition: all 0.3s ease;
+    border: none;
+    outline: none;
+    
+}
+
+.phoneFixedButton:hover {
+    transform: scale(1.1);
+    animation: none;
+}
+
+.phoneFixedButton:focus {
+    box-shadow: 0 0 0 3px #7b45388f;
+}
+
+.noVibration {
+    animation: none;
+}
+
+.phoneIconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.phoneIcon {
+    width: 60%;
+    height: 60%;
+    filter: brightness(0) invert(1);
+}
+
+/* Анимация вибрации */
+@keyframes vibrate {
+    0% {
+        transform: translateX(0) rotate(0deg);
+    }
+
+    2% {
+        transform: translateX(-1px) rotate(-1deg);
+    }
+
+    4% {
+        transform: translateX(1px) rotate(1deg);
+    }
+
+    6% {
+        transform: translateX(-1px) rotate(0deg);
+    }
+
+    8% {
+        transform: translateX(1px) rotate(-1deg);
+    }
+
+    10% {
+        transform: translateX(0) rotate(1deg);
+    }
+
+    100% {
+        transform: translateX(0) rotate(0deg);
+    }
+}
+
+/* Анимация пульсирующего кольца */
+.pulseRing {
+    position: absolute;
+    top: 1;
+    left: 1;
+    width: 100%;
+    height: 100%;
+    border: 2px solid #7B4538;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    opacity: 0.7;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .phoneFixedButton {
+        width: 50px !important;
+        height: 50px !important;
+        bottom: 20px !important;
+        right: 20px !important;
+    }
+}

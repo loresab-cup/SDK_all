@@ -1,0 +1,299 @@
+/* Оверлей (фон) */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+}
+
+.overlayEnter {
+    opacity: 1;
+}
+
+/* Модальное окно */
+.modal {
+    background: white;
+    border-radius: 16px;
+    padding: 0;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9) translateY(-20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.modalEnter {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* Заголовок */
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0;
+    margin-bottom: 24px;
+}
+
+.modalTitle {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+/* Кнопка закрытия */
+.closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    color: #666;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeButton:hover {
+    background: #f5f5f5;
+    color: #333;
+}
+
+/* Форма */
+.form {
+    padding: 0 24px;
+}
+
+.formGroup {
+    margin-bottom: 24px;
+}
+
+.label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.phoneInput {
+    width: 40%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    background-color: #ddd;
+    color: #553026;
+    font-weight: 500;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+    font-family: monospace;
+}
+
+.phoneInput:focus {
+    outline: none;
+    border-color: #553026;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.phoneInput::placeholder {
+    color: #999;
+}
+
+.phoneHint {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+/* Чекбокс */
+.checkboxGroup {
+    margin-bottom: 32px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.checkbox {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: relative;
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.checkboxLabel:hover .checkmark {
+    border-color: #553026;
+}
+
+.checkbox:checked+.checkmark {
+    background-color: #553026;
+    border-color: #553026;
+}
+
+.checkbox:checked+.checkmark:after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkboxText {
+    color: #333;
+}
+
+.privacyLink {
+    color: #553026;
+    text-decoration: none;
+}
+
+.privacyLink:hover {
+    text-decoration: underline;
+}
+
+/* Кнопка отправки */
+.submitButton {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #553026, #7B4538);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 16px;
+}
+
+.submitButton:hover:not(:disabled) {
+    background: linear-gradient(135deg, #553026, #553026);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px #55302686;
+}
+
+.submitButton:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.submitButtonDisabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Индикатор загрузки */
+.loadingText {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Футер */
+.footer {
+    padding: 16px 24px 24px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.footerText {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .modalOverlay {
+        padding: 10px;
+        align-items: flex-end;
+    }
+
+    .modal {
+        border-radius: 16px 16px 0 0;
+        max-width: none;
+    }
+
+    .modalHeader {
+        padding: 20px 20px 0;
+    }
+
+    .modalTitle {
+        font-size: 20px;
+    }
+
+    .form {
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modalHeader {
+        padding: 16px 16px 0;
+    }
+
+    .form {
+        padding: 0 16px;
+    }
+
+    .footer {
+        padding: 12px 16px 16px;
+    }
+}

@@ -1,0 +1,124 @@
+.footer {
+    background-color: #7B4538;
+    color: #F2E5D7;
+    margin-top: auto;
+    /* Для прижатия футера к низу */
+}
+
+.footerMain {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 50px 20px;
+    gap: 40px;
+}
+
+.footerSection {
+    flex: 1;
+    min-width: 0;
+    /* Для корректного flex поведения */
+}
+
+.logoSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.footerLogo {
+    width: auto;
+    max-width: 80px;
+}
+
+.companyDescription {
+    line-height: 1.6;
+    color: #bdc3c7;
+    font-size: 14px;
+    margin: 0;
+}
+
+.sectionTitle {
+    color: #ecf0f1;
+    font-size: 18px;
+}
+
+.footerNav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footerLink {
+    color: #bdc3c7;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+    padding: 4px 0;
+}
+
+.footerLink:hover {
+    color: #F2E5D7;
+    padding-left: 5px;
+}
+
+.contactInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contactItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contactLabel {
+    font-weight: 600;
+    color: #ecf0f1;
+    font-size: 14px;
+}
+
+.contactText {
+    color: #bdc3c7;
+    font-size: 14px;
+}
+
+.footerBottom {
+    background-color: #553026;
+    padding: 20px 0;
+}
+
+.copyright {
+    text-align: center;
+    color: #95a5a6;
+    font-size: 14px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .footerMain {
+        flex-direction: column;
+        padding: 30px 20px;
+        gap: 30px;
+    }
+
+    .footerSection {
+        text-align: center;
+    }
+
+    .logoSection {
+        align-items: center;
+    }
+
+    .footerNav {
+        align-items: center;
+    }
+
+    .contactItem {
+        align-items: center;
+    }
+}

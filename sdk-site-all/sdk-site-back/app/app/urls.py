@@ -1,0 +1,16 @@
+from django.contrib import admin
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+from main import views
+
+router = DefaultRouter()
+router.register(r'products', views.ProductViewSet, basename='product') # viewset для товаров
+router.register(r'cart', views.CartViewSet, basename='cart') # viewset для корзины
+router.register(r'orders', views.OrderViewSet, basename='order') # viewset для заказов
+router.register(r'callbacks', views.CallbackRequestViewSet, basename='callback') # viewset для запросов
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+]

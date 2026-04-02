@@ -1,0 +1,320 @@
+/* ShopingCart.module.css */
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.overlayVisible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+/* Корзина */
+.cart {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    max-width: 500px;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 20px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+}
+
+.cartOpen {
+    right: 0;
+}
+
+/* Остальные стили остаются без изменений */
+.cartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 2px solid #8B4513;
+    background: #f8f4f0;
+}
+
+.cartTitle {
+    margin: 0;
+    color: #5D4037;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #8B4513;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+    background-color: rgba(139, 69, 19, 0.1);
+}
+
+.cartContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.emptyCart {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    color: #795548;
+}
+
+.emptyCartIcon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.emptyCart p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.emptyCart span {
+    color: #9E9E9E;
+}
+
+.cartItems {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.cartItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #E0E0E0;
+}
+
+.cartItem:last-child {
+    border-bottom: none;
+}
+
+.itemInfo {
+    flex: 1;
+}
+
+.itemName {
+    margin: 0 0 8px 0;
+    color: #5D4037;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.itemDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.dimensions {
+    font-weight: 500;
+    color: #8B4513;
+}
+
+.woodType {
+    color: #795548;
+    font-size: 0.9rem;
+}
+
+.grade {
+    color: #9E9E9E;
+    font-size: 0.85rem;
+}
+
+.itemPrice {
+    color: #8B4513;
+    font-weight: 500;
+}
+
+.itemControls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.quantityControls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #E0E0E0;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.quantityButton {
+    background: none;
+    border: none;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    color: #8B4513;
+    transition: background-color 0.2s;
+}
+
+.quantityButton:hover {
+    background-color: rgba(139, 69, 19, 0.1);
+}
+
+.quantity {
+    font-weight: 500;
+    min-width: 30px;
+    text-align: center;
+}
+
+.itemTotal {
+    font-weight: 600;
+    color: #5D4037;
+    font-size: 1.1rem;
+}
+
+.removeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.removeButton:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.cartFooter {
+    padding: 20px;
+    border-top: 2px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.totalSection {
+    margin-bottom: 20px;
+}
+
+.totalLine {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.totalPrice {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #8B4513;
+}
+
+.totalItems {
+    color: #9E9E9E;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.checkoutButton {
+    width: 100%;
+    padding: 15px;
+    background: #8B4513;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 15px;
+}
+
+.checkoutButton:hover {
+    background: #A0522D;
+}
+
+.cartNote {
+    text-align: center;
+    color: #795548;
+    font-size: 0.9rem;
+    padding: 10px;
+    background: rgba(139, 69, 19, 0.05);
+    border-radius: 4px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .cart {
+        max-width: 100%;
+    }
+
+    .cartItem {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .itemControls {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .cartHeader {
+        padding: 15px;
+    }
+
+    .cartTitle {
+        font-size: 1.3rem;
+    }
+
+    .cartItems {
+        padding: 15px;
+    }
+
+    .cartFooter {
+        padding: 15px;
+    }
+}

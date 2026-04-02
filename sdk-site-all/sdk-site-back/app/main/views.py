@@ -1,0 +1,511 @@
+"""from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Price
+from .serializers import PriceUpsertSerializer
+
+@api_view(["POST"])
+def upsert_price(request):
+    ser = PriceUpsertSerializer(data=request.data)
+    ser.is_valid(raise_exception=True)
+    data = ser.validated_data
+
+    obj, created = Price.objects.update_or_create(
+        product=data["product"],
+        grade=data.get("grade"),
+        surface=data.get("surface"),
+        width=data.get("width"),
+        defaults={"price_rub": data["price_rub"]},
+    )
+
+    return Response(
+        {"id": obj.id, "created": created, "price_rub": str(obj.price_rub)},
+        status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
+    )"""
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
+from django.db import transaction
+from django.db.models import Prefetch
+from django.utils.crypto import get_random_string
+from datetime import datetime
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
+from django.conf import settings
+from django.core.mail import send_mail
+
+from .models import (
+    Product, ProductVariant, Cart, CartItem,
+    Order, OrderItem, CallbackRequest, Session, OrderStatus
+)
+from .serializers import (
+    ProductListSerializer, ProductDetailSerializer, ProductVariantSerializer,
+    CartSerializer, AddToCartSerializer, UpdateCartItemSerializer,
+    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer
+)
+
+
+def get_or_create_session(request):
+    """
+    Эта функция проверяет есть ли у пользователя сессия
+    Фронтенд должен отправлять ключ сессии в заголовке X-Session-Key
+    Если ключа нет - создаем новую сессию
+    """
+    session_key = request.headers.get('X-Session-Key')
+
+    if not session_key: # Ключа нет - генерируем новый ключ (32 символа)
+        session_key = get_random_string(32)
+
+    session, _ = Session.objects.get_or_create(session_key=session_key) # Получаем сессию
+    return session
+
+
+class ProductViewSet(viewsets.ReadOnlyModelViewSet): # API для работы с товарами
+    #ViewSet только для чтения (ReadOnly) - можно только получать данные
+    #Создание/изменение/удаление товаров только через админку
+
+    queryset = Product.objects.filter(is_active=True).prefetch_related(
+        Prefetch(
+            'variants',
+            queryset=ProductVariant.objects.filter(is_active=True).select_related('grade', 'surface', 'width')
+        ),
+        'grades',
+        'surfaces',
+        'widths',
+    )
+
+    def get_serializer_class(self):
+        """
+        Выбираем какой сериализатор использовать:
+        - Для списка товаров - краткая информация (ProductListSerializer)
+        - Для детального просмотра - полная информация (ProductDetailSerializer)
+        """
+        # Всегда отдаём подробные данные, чтобы фронт мог построить карточки
+        return ProductDetailSerializer
+
+    @action(detail=True, methods=['get'])
+    def variants(self, request, pk=None):
+        """
+        Кастомный endpoint для получения вариантов товара
+        URL: /api/products/{id}/variants/
+
+        Параметры фильтрации (опционально):
+        - grade_id: фильтр по сорту
+        - surface_id: фильтр по поверхности
+        - width_id: фильтр по ширине
+        """
+        product = self.get_object() # Получаем товар по ID
+
+        # Получаем все активные варианты этого товара
+        # select_related - оптимизация, подгружаем связанные объекты сразу
+        variants = ProductVariant.objects.filter(product=product, is_active=True).select_related('grade', 'surface', 'width')
+
+        #   Фильтрация по параметрам из URL
+        grade_id = request.query_params.get('grade_id')
+        surface_id = request.query_params.get('surface_id')
+        width_id = request.query_params.get('width_id')
+
+        # Применяем фильтры если они переданы
+        if grade_id:
+            variants = variants.filter(grade_id=grade_id)
+        if surface_id:
+            variants = variants.filter(surface_id=surface_id)
+        if width_id:
+            variants = variants.filter(width_id=width_id)
+
+        # Преобразуем в JSON и отправляем
+        serializer = ProductVariantSerializer(variants, many=True)
+        return Response(serializer.data)
+
+
+class CartViewSet(viewsets.ViewSet): # API для работы с корзиной
+
+    def get_cart(self, request):
+        """
+        Вспомогательный метод для получения корзины текущего пользователя
+        """
+        session = get_or_create_session(request)
+
+        cart, _ = Cart.objects.get_or_create(session=session) # Получаем или создаем корзину для этой сессии
+        return cart
+
+    def retrieve(self, request): #Получить содержимое корзины пользователя
+        cart = self.get_cart(request) # Получаем корзину
+        serializer = CartSerializer(cart) # Преобразуем в JSON
+
+        # Отправляем ответ с корзиной и ключом сессии
+        return Response({
+            'cart': serializer.data,
+            'session_key': cart.session.session_key
+        })
+
+    @action(detail=False, methods=['post'])
+    def add_item(self, request):
+        """
+        Ожидаемые данные в теле запроса:
+        {
+            "variant_id": 123,
+            "quantity": 2
+        }
+        """
+        # Валидируем входные данные
+        serializer = AddToCartSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)  # Если невалидно - ошибка 400
+
+        # Получаем корзину пользователя
+        cart = self.get_cart(request)
+
+        # Извлекаем данные
+        variant_id = serializer.validated_data['variant_id']
+        quantity = serializer.validated_data['quantity']
+
+        # Проверяем что вариант товара существует и активен если не найден - ошибка 404
+        variant = get_object_or_404(ProductVariant, id=variant_id, is_active=True)
+
+        # Пытаемся получить существующий товар в корзине или создать новый
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            variant=variant,
+            defaults={
+                'quantity': quantity,  # Если создаем новый - ставим указанное количество
+                'price_at_moment': variant.price_per_m3  # Сохраняем текущую цену
+            }
+        )
+
+        # Если товар уже был в корзине - увеличиваем количество
+        if not created:
+            cart_item.quantity += quantity
+            cart_item.save()
+
+        # Отправляем обновленную корзину и ключ сессии
+        cart_serializer = CartSerializer(cart)
+        return Response({
+            'cart': cart_serializer.data,
+            'session_key': cart.session.session_key
+        }, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['patch'], url_path='items/(?P<item_id>[^/.]+)')
+    def update_item(self, request, item_id=None):
+        """
+        PATCH /api/cart/items/{item_id}/
+        Изменить количество товара в корзине
+
+        Ожидаемые данные:
+        {
+            "quantity": 5
+        }
+        """
+        # Получаем корзину
+        cart = self.get_cart(request)
+
+        # Находим товар в корзине или выдаем 404
+        cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
+
+        # Валидируем новое количество
+        serializer = UpdateCartItemSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Обновляем количество
+        cart_item.quantity = serializer.validated_data['quantity']
+        cart_item.save()
+
+        # Отправляем обновленную корзину
+        cart_serializer = CartSerializer(cart)
+        return Response(cart_serializer.data)
+
+    @action(detail=False, methods=['delete'], url_path='items/(?P<item_id>[^/.]+)')
+    def remove_item(self, request, item_id=None):
+        """
+        DELETE /api/cart/items/{item_id}/
+        Удалить товар из корзины
+        """
+        # Получаем корзину
+        cart = self.get_cart(request)
+
+        # Находим товар в корзине или выдаем 404
+        cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
+
+        # Удаляем товар
+        cart_item.delete()
+
+        # Отправляем обновленную корзину
+        cart_serializer = CartSerializer(cart)
+        return Response(cart_serializer.data)
+
+    @action(detail=False, methods=['delete'])
+    def clear(self, request):
+        """
+        DELETE /api/cart/clear/
+        Очистить всю корзину
+        """
+        # Получаем корзину
+        cart = self.get_cart(request)
+
+        # Удаляем все товары из корзины
+        cart.items.all().delete()
+
+        # Отправляем пустую корзину
+        cart_serializer = CartSerializer(cart)
+        return Response(cart_serializer.data)
+
+
+class OrderViewSet(viewsets.ModelViewSet): # API для работы с заказами
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    def create(self, request):
+        """
+        Создать заказ из текущей корзины
+        Ожидаемые данные:
+        {
+            "client_name": "Иван",
+            "client_surname": "Иванов",
+            "client_patronymic": "Иванович",  // необязательно
+            "phone": "+79001234567",
+            "email": "ivan@example.com",  // необязательно
+            "comment": "Доставка после 18:00"  // необязательно
+        }
+        """
+        # Валидируем данные клиента
+        serializer = CreateOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Получаем сессию пользователя
+        session = get_or_create_session(request)
+
+        # Проверяем что у пользователя есть корзина
+        try:
+            cart = Cart.objects.get(session=session)
+        except Cart.DoesNotExist:
+            return Response(
+                {'error': 'Корзина пуста'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Проверяем что в корзине есть товары
+        if not cart.items.exists():
+            return Response(
+                {'error': 'Корзина пуста'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Получаем или создаем статус "Новый"
+        order_status, _ = OrderStatus.objects.get_or_create(name='Новый')
+
+        # Используем транзакцию чтобы все операции выполнились вместе
+        # Если что-то пойдет не так - все откатится
+        cart_items = list(
+            cart.items.select_related(
+                'variant',
+                'variant__product',
+                'variant__grade',
+                'variant__surface',
+                'variant__width'
+            )
+        )
+
+        with transaction.atomic():
+            # Формат: ORD-YYYYMMDD-XXXXXX
+            order_number = f"ORD-{datetime.now().strftime('%Y%m%d')}-{get_random_string(6, '0123456789')}"
+
+            #  Создание заказа
+            order = Order.objects.create(
+                order_number=order_number,
+                cart=cart,
+                client_name=serializer.validated_data['client_name'],
+                client_surname=serializer.validated_data['client_surname'],
+                client_patronymic=serializer.validated_data.get('client_patronymic', ''),
+                phone=serializer.validated_data['phone'],
+                email=serializer.validated_data.get('email', ''),
+                comment=serializer.validated_data.get('comment', ''),
+                status=order_status
+            )
+
+            #  Копирование товаров из корзины в заказ
+            for cart_item in cart_items:
+                # Создаем копию товара в заказе
+                # Сохраняем цену на момент заказа (не изменится даже если цена товара изменится)
+                OrderItem.objects.create(
+                    order=order,
+                    variant=cart_item.variant,
+                    quantity=cart_item.quantity,
+                    price=cart_item.price_at_moment
+                )
+
+            #  Очистка корзины после оформления заказа
+            cart.items.all().delete()
+
+        # Отправляем уведомление в Telegram и Email (если настроено)
+        self._notify_telegram(order, cart_items)
+        self._notify_email(order, cart_items)
+
+        # Преобразуем заказ в JSON и отправляем
+        order_serializer = OrderSerializer(order)
+        return Response(order_serializer.data, status=status.HTTP_201_CREATED)
+
+    def _notify_telegram(self, order: Order, cart_items):
+        token = settings.TELEGRAM_BOT_TOKEN
+        chat_id = settings.TELEGRAM_CHAT_ID
+        if not token or not chat_id:
+            return
+
+        lines = [
+            "🧾 *Новый заказ*",
+            f"№ `{order.order_number}`",
+            f"Клиент: *{order.client_surname} {order.client_name} {order.client_patronymic or ''}*".strip(),
+            f"Телефон: `{order.phone}`",
+        ]
+
+        if order.email:
+            lines.append(f"Email: `{order.email}`")
+        if order.comment:
+            lines.append(f"Комментарий: {order.comment}")
+
+        lines.append("Позиции:")
+        total = 0
+
+        for item in cart_items:
+            variant = item.variant
+            product = variant.product
+
+            width = variant.width.value if variant.width else '-'
+            grade = variant.grade.name if variant.grade else '-'
+            surface = variant.surface.name if variant.surface else '-'
+
+            dimensions = f"{variant.thickness}x{width}x{variant.length}"
+            price = item.price_at_moment
+            line_total = price * item.quantity
+            total += line_total
+
+            lines.append(
+                f"• {product.name} | {dimensions} | {surface} | сорт {grade} | {price} x {item.quantity} = {line_total}"
+            )
+
+        lines.append(f"Итого: *{total}*")
+
+        message = "\n".join(lines)
+
+        try:
+            url = f"https://api.telegram.org/bot{token}/sendMessage"
+            data = urlencode({
+                "chat_id": chat_id,
+                "text": message,
+                "parse_mode": "Markdown"
+            }).encode("utf-8")
+            req = Request(url, data=data)
+            with urlopen(req, timeout=10) as resp:
+                resp.read()
+        except Exception as exc:
+            # Не блокируем создание заказа из-за проблем с Telegram
+            print(f"Telegram notify error: {exc}")
+
+    def _notify_email(self, order: Order, cart_items):
+        to_email = settings.EMAIL_ADMIN
+        if not to_email or not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+            return
+
+        lines = [
+            f"Новый заказ №{order.order_number}",
+            f"Клиент: {order.client_surname} {order.client_name} {order.client_patronymic or ''}".strip(),
+            f"Телефон: {order.phone}",
+        ]
+
+        if order.email:
+            lines.append(f"Email: {order.email}")
+        if order.comment:
+            lines.append(f"Комментарий: {order.comment}")
+
+        lines.append("Позиции:")
+        total = 0
+
+        for item in cart_items:
+            variant = item.variant
+            product = variant.product
+
+            width = variant.width.value if variant.width else '-'
+            grade = variant.grade.name if variant.grade else '-'
+            surface = variant.surface.name if variant.surface else '-'
+
+            dimensions = f"{variant.thickness}x{width}x{variant.length}"
+            price = item.price_at_moment
+            line_total = price * item.quantity
+            total += line_total
+
+            lines.append(
+                f"- {product.name} | {dimensions} | {surface} | сорт {grade} | {price} x {item.quantity} = {line_total}"
+            )
+
+        lines.append(f"Итого: {total}")
+
+        subject = f"Новый заказ №{order.order_number}"
+        message = "\n".join(lines)
+
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[to_email],
+                fail_silently=False,
+            )
+        except Exception as exc:
+            print(f"Email notify error: {exc}")
+
+    @action(detail=True, methods=['get'])
+    def telegram_link(self, request, pk=None):
+        """
+        Получить ссылку для перехода в Telegram бота с данными заказа
+
+        Эта ссылка отправляется на фронтенд после создания заказа
+        При переходе по ней открывается Telegram бот с информацией о заказе
+        """
+        # Получаем заказ по ID
+        order = self.get_object()
+
+        # Формируем ссылку на бота с параметром заказа
+        # ВАЖНО: Замените "ваш_бот_username" на настоящее имя вашего бота
+        bot_username = "ваш_бот_username"
+
+        # Формат ссылки: https://t.me/bot_username?start=order_123
+        # Параметр start=order_123 передается боту при запуске
+        telegram_url = f"https://t.me/{bot_username}?start=order_{order.id}"
+
+        return Response({
+            'telegram_url': telegram_url,
+            'order_id': order.id,
+            'order_number': order.order_number
+        })
+
+
+class CallbackRequestViewSet(viewsets.ModelViewSet):
+    """
+    Для заявок на обратный звонок
+    Разрешены только GET (список) и POST (создание)
+    """
+    queryset = CallbackRequest.objects.all()
+    serializer_class = CallbackRequestSerializer
+    http_method_names = ['get', 'post']  # Только чтение и создание
+
+    def create(self, request):
+        """
+        Создать запрос на обратный звонок
+        Ожидаемые данные:
+                {
+                    "phone": "+79001234567"
+                }
+                """
+        # Валидируем данные
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Сохраняем заявку в базу
+        serializer.save()
+
+        # Отправляем подтверждение пользователю
+        return Response(
+            {'message': 'Заявка принята. Мы свяжемся с вами в ближайшее время.'},
+            status=status.HTTP_201_CREATED
+        )

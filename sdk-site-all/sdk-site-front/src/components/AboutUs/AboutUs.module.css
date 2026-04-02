@@ -1,0 +1,93 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.sectionTitle {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    margin-top: 0px;
+    color: #000000;
+}
+
+.featuresSection {
+    padding: 80px 0;
+    background-color: #ffffff;
+}
+
+.featuresGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 40px;
+    margin-top: 50px;
+}
+
+.featureCard {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.featureCard:hover {
+    transform: translateY(-10px);
+}
+
+.featureIconQuality {
+    width: 80px;
+    height: 80px;
+}
+
+.featureIconPrices {
+    width: 73.2px;
+    height: 73.2px;
+}
+
+.featureIconAdvice {
+    width: 66px;
+    height: 66px;
+}
+
+.featureIconDelivery {
+    width: 58px;
+    height: 58px;
+}
+
+.featureText {
+    padding-left: 10px;
+
+}
+
+.featureCard h3 {
+    font-size: 1.5rem;
+    color: #000000;
+    margin-bottom: 15px;
+    margin-top: 0px;
+}
+
+.featureCard p {
+    color: #666;
+    line-height: 1.6;
+}
+
+
+
+@media (max-width: 768px) {
+    .sectionTitle {
+        font-size: 2rem;
+    }
+
+    .featuresGrid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .featuresSection {
+        padding: 50px 0;
+    }
+}

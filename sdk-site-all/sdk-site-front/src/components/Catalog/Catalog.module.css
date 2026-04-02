@@ -1,0 +1,6 @@
+.catalogContent {
+    flex: 1;
+    background: transparent;
+    padding: 40px 0;
+    min-height: 70vh;
+}
