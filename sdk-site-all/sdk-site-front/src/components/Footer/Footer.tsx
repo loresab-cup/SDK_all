@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './Footer.module.css';
-
 import logo from '@assets/logoLight.png';
 
+const defaultSettings = {
+    phone: '+7 (888) 888-88-88',
+    email: 'adress_email.ru',
+    address: 'г. Томск, ул. Кузовлевский тракт, 2Б ст31',
+    workHours: 'Пн-Пт: 9:00-18:00, Сб: 10:00-16:00',
+    footerText: '© 2026 ООО «СДК». Все права защищены.'
+};
+
 const Footer: React.FC = () => {
+    const [settings, setSettings] = useState(defaultSettings);
+
+    useEffect(() => {
+        const saved = localStorage.getItem('site_settings');
+        if (saved) {
+            setSettings(prev => ({ ...prev, ...JSON.parse(saved) }));
+        }
+    }, []);
 
     return (
         <header className={styles.footer}>
@@ -35,26 +50,26 @@ const Footer: React.FC = () => {
                     <div className={styles.contactInfo}>
                         <div className={styles.contactItem}>
                             <span className={styles.contactLabel}>Адрес:</span>
-                            <span className={styles.contactText}>г. Томск, ул. Кузовлевский тракт, 2Б ст31 </span>
+                            <span className={styles.contactText}>{settings.address}</span>
                         </div>
                         <div className={styles.contactItem}>
                             <span className={styles.contactLabel}>Телефон:</span>
-                            <span className={styles.contactText}>+7 (888) 888 88-88</span>
+                            <span className={styles.contactText}>{settings.phone}</span>
                         </div>
                         <div className={styles.contactItem}>
                             <span className={styles.contactLabel}>Email:</span>
-                            <span className={styles.contactText}>adress_email.ru</span>
+                            <span className={styles.contactText}>{settings.email}</span>
                         </div>
                         <div className={styles.contactItem}>
                             <span className={styles.contactLabel}>Режим работы:</span>
-                            <span className={styles.contactText}>Пн-Пт: 9:00-18:00</span>
+                            <span className={styles.contactText}>{settings.workHours}</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div className={styles.footerBottom}>
                 <div className={styles.copyright}>
-                    © {new Date().getFullYear()} ООО «СДК». Все права защищены.
+                    {settings.footerText}
                 </div>
             </div>
         </header>

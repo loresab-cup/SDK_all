@@ -117,7 +117,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     // Функция для добавления товара
     const addItem = (product: Product, variant: ProductVariant, quantity: number) => {
         const cartItem: CartItem = {
-            id: `${product.id}-${variant.id}-${Date.now()}`,
+            id: `${product.id}-${variant.id}`,
             productId: product.id,
             variantId: variant.id,
             name: product.name,

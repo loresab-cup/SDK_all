@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
-import styles from './ProductCatalog.module.css'; // путь к вашему CSS-модулю
+import styles from './ProductCatalog.module.css';
+import VariantPanel from '../VariantPanel/VariantPanel';
+import { useCart } from '../../contexts/CartContext';
 
 type Tab = 'description' | 'price' | 'properties' | 'documents';
 
 interface Props {
-    title: string; // например, "Доска обрезная"
+    title: string;
 }
 
 const BoardProduct: React.FC<Props> = ({ title }) => {
     const [activeTab, setActiveTab] = useState<Tab>('price');
 
-    // Состояние для выделенной ячейки в таблице досок
-    const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
+    // Состояния для выделенных ячеек
+    const [selectedCells, setSelectedCells] = useState<{ row: number; col: number }[]>([]);
+    
+    // Состояния для панели выбора количества
+    const [items, setItems] = useState<any[]>([]);
+    const { addItem } = useCart();
 
-    // Данные для таблицы пиломатериалов
+    // Данные для таблицы досок (исходный формат)
     const priceData = [
         { sort: 'I-III', width: 100, prices: ['150 р.', '225 р.', '300 р.', '450 р.'] },
         { sort: 'I-III', width: 120, prices: ['180 р.', '270 р.', '360 р.', '540 р.'] },
@@ -22,9 +28,104 @@ const BoardProduct: React.FC<Props> = ({ title }) => {
         { sort: 'I-III', width: 200, prices: ['300 р.', '450 р.', '600 р.', '900 р.'] },
     ];
 
-    const handlePriceClick = (rowIndex: number, colIndex: number, price: string) => {
-        setSelectedCell({ row: rowIndex, col: colIndex });
-        console.log('Доска:', price);
+    // Функции для панели
+    const addOrUpdateItem = (variantData: any) => {
+        const existingIndex = items.findIndex(item => item.id === variantData.id);
+        if (existingIndex >= 0) {
+            const updated = [...items];
+            updated[existingIndex].quantity += 1;
+            setItems(updated);
+        } else {
+            setItems([...items, { ...variantData, quantity: 1 }]);
+        }
+    };
+
+    const updateQuantity = (id: string, newQuantity: number) => {
+        if (newQuantity <= 0) {
+            const item = items.find(item => item.id === id);
+            if (item) {
+                setSelectedCells(selectedCells.filter(
+                    cell => !(cell.row === item.rowIdx && cell.col === item.colIdx)
+                ));
+            }
+            setItems(items.filter(item => item.id !== id));
+        } else {
+            setItems(items.map(item => 
+                item.id === id ? { ...item, quantity: newQuantity } : item
+            ));
+        }
+    };
+
+    const removeItem = (id: string) => {
+        const item = items.find(item => item.id === id);
+        if (item) {
+            setSelectedCells(selectedCells.filter(
+                cell => !(cell.row === item.rowIdx && cell.col === item.colIdx)
+            ));
+        }
+        setItems(items.filter(item => item.id !== id));
+    };
+
+    const handleAddToCartFinal = () => {
+        if (items.length === 0) return;
+        
+        items.forEach(item => {
+            const product = {
+                id: item.id,
+                name: title,
+                image: '',
+            };
+            
+            const variant = {
+                id: item.id,
+                dimensions: item.dimensions,
+                woodType: item.woodType,
+                grade: item.grade,
+                price: item.price,
+                stock: 1000,
+            };
+            
+            addItem(product, variant, item.quantity);
+        });
+        
+        setItems([]);
+        setSelectedCells([]);
+    };
+
+    // Извлечение числового значения из цены (например "150 р." → 150)
+    const parsePrice = (priceStr: string): number => {
+        return parseInt(priceStr.replace(' р.', ''), 10);
+    };
+
+    // Обработчик клика по цене
+    const handlePriceClick = (rowIdx: number, colIdx: number, priceStr: string) => {
+        const price = parsePrice(priceStr);
+        
+        // Логика выделения
+        const alreadySelected = selectedCells.some(
+            cell => cell.row === rowIdx && cell.col === colIdx
+        );
+        
+        if (alreadySelected) {
+            setSelectedCells(selectedCells.filter(
+                cell => !(cell.row === rowIdx && cell.col === colIdx)
+            ));
+        } else {
+            setSelectedCells([...selectedCells, { row: rowIdx, col: colIdx }]);
+        }
+        
+        // Логика добавления в панель
+        const variantData = {
+            id: `board-${rowIdx}-${colIdx}`,
+            dimensions: `${priceData[rowIdx].width}×25×${colIdx === 0 || colIdx === 2 ? '4' : '6'} м`,
+            woodType: 'Сосна/Ель',
+            grade: priceData[rowIdx].sort,
+            price: price,
+            rowIdx: rowIdx,
+            colIdx: colIdx,
+        };
+        
+        addOrUpdateItem(variantData);
     };
 
     return (
@@ -94,8 +195,9 @@ const BoardProduct: React.FC<Props> = ({ title }) => {
                                                 <td>{row.sort}</td>
                                                 <td>{row.width}</td>
                                                 {row.prices.map((price, colIdx) => {
-                                                    const isSelected =
-                                                        selectedCell?.row === rowIdx && selectedCell?.col === colIdx;
+                                                    const isSelected = selectedCells.some(
+                                                        cell => cell.row === rowIdx && cell.col === colIdx
+                                                    );
                                                     return (
                                                         <td
                                                             key={colIdx}
@@ -109,7 +211,6 @@ const BoardProduct: React.FC<Props> = ({ title }) => {
                                                 })}
                                             </tr>
                                         ))}
-
                                         <tr>
                                             <td rowSpan={2}></td>
                                             <td rowSpan={2}></td>
@@ -119,10 +220,18 @@ const BoardProduct: React.FC<Props> = ({ title }) => {
                                             <td>6</td>
                                         </tr>
                                         <tr>
-                                            <td colSpan={4}>Длина доски, мм.</td>
+                                            <td colSpan={4}>Длина доски, м.</td>
                                         </tr>
                                     </tbody>
                                 </table>
+
+                                {/* Панель выбора количества */}
+                                <VariantPanel
+                                    items={items}
+                                    onQuantityChange={updateQuantity}
+                                    onRemoveItem={removeItem}
+                                    onAddToCart={handleAddToCartFinal}
+                                />
                             </div>
                         )}
 
