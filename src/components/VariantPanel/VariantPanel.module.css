@@ -91,3 +91,32 @@
 .addBtn:hover {
     background: #7a4536;
 }
+
+@media (max-width: 768px) {
+    .panel {
+        padding: 12px;
+        font-size: 12px;
+    }
+    
+    .headerRow, .itemRow {
+        gap: 8px;
+    }
+    
+    .colDim { flex: 1.5; }
+    .colWood { flex: 1; }
+    .colGrade { flex: 0.8; }
+    .colPrice { flex: 0.8; }
+    .colQty { flex: 0.8; }
+    .colAction { flex: 0.3; }
+    
+    .qtyBtn {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+    }
+    
+    .addBtn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+}

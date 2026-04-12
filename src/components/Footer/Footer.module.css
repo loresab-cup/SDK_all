@@ -122,3 +122,18 @@
         align-items: center;
     }
 }
+
+@media (max-width: 768px) {
+    .footerMain {
+        flex-direction: column;
+        gap: 24px;
+    }
+    
+    .footerSection {
+        text-align: center;
+    }
+    
+    .contactInfo {
+        align-items: center;
+    }
+}

@@ -7,6 +7,7 @@ import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AdminProducts from './components/AdminProducts/AdminProducts';
 import AdminOrders from './components/AdminOrders/AdminOrders';
 import AdminSettings from './components/AdminSettings/AdminSettings';
+import CheckoutPage from './pages/CheckoutPage';
 
 import {
   Header,
@@ -43,6 +44,7 @@ function App() {
               <Route path="orders" element={<AdminOrders />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
+            <Route path="/checkout" element={<CheckoutPage />} />
           </Routes>
           <Footer />
         </div>

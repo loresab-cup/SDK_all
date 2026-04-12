@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './ShopingCart.module.css';
 import type { ShopingCartProps } from '@types';
+import { useNavigate } from 'react-router-dom'
 
 const ShopingCart: React.FC<ShopingCartProps> = ({
     isOpen = false,
@@ -10,6 +11,8 @@ const ShopingCart: React.FC<ShopingCartProps> = ({
     onRemoveItem,
     onCheckout
 }) => {
+    const navigate = useNavigate();
+
     const handleIncreaseQuantity = (id: string) => {
         const item = items.find(item => item.id === id);
         if (item && onUpdateQuantity) {
@@ -55,9 +58,7 @@ const ShopingCart: React.FC<ShopingCartProps> = ({
                 onClick={onClose}
             />
 
-            <div
-                className={`${styles.cart} ${isOpen ? styles.cartOpen : ''}`}
-            >
+            <div className={`${styles.cart} ${isOpen ? styles.cartOpen : ''}`}>
                 <div className={styles.cartHeader}>
                     <h2 className={styles.cartTitle}>Корзина пиломатериалов</h2>
                     <button
@@ -141,10 +142,15 @@ const ShopingCart: React.FC<ShopingCartProps> = ({
 
                                 <button
                                     className={styles.checkoutButton}
-                                    onClick={onCheckout}
+                                    onClick={() => {
+                                        onClose(); // закрывает корзину
+                                        navigate('/checkout');
+                                    }}
                                 >
                                     Оформить заказ
                                 </button>
+
+                                
 
                                 <div className={styles.cartNote}>
                                     📞 Бесплатная консультация по подбору пиломатериалов
