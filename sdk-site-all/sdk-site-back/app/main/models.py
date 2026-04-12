@@ -8,7 +8,7 @@ class Product (models.Model):
     is_active = models.BooleanField(default=True, verbose_name="Активен") # Флаг активности - показывать ли товар на сайте
     # Объем от которого начинает действовать скидка (в кубометрах)
     discount_volume = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name="Объем от скидки (м³)")
-
+    image = models.ImageField(verbose_name="Изображение товара", upload_to="Photo", blank = True) #Изображение товара
     # Дата создания товара в системе
     created_at = models.DateTimeField(auto_now_add=True)
 

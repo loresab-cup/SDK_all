@@ -34,11 +34,15 @@ class WidthSerializer(serializers.ModelSerializer): # Преобразовани
 
 
 class ProductListSerializer(serializers.ModelSerializer): #Краткая информация о товаре для главной страницы
-
+    image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ['id', 'name', 'category', 'is_active']
+        fields = ['id', 'name', 'category', 'is_active', 'image']
 
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
 
 class ProductVariantSerializer(serializers.ModelSerializer): # Информация о конкретном товаре с его параметрами
     # Связанные объекты преобразуем в вложенный json (для чтения)
@@ -60,6 +64,7 @@ class ProductVariantSerializer(serializers.ModelSerializer): # Информац�
 
 
 class ProductDetailSerializer(serializers.ModelSerializer): #Подробная информация о товаре для каталога
+    image = serializers.SerializerMethodField()
     variants = ProductVariantSerializer(many=True, read_only=True)
     grades = GradeSerializer(many=True, read_only=True)
     surfaces = SurfaceSerializer(many=True, read_only=True)
@@ -70,9 +75,13 @@ class ProductDetailSerializer(serializers.ModelSerializer): #Подробная 
         fields = [
             'id', 'name', 'category', 'description',
             'is_active', 'discount_volume', 'variants',
-            'grades', 'surfaces', 'widths'
+            'grades', 'surfaces', 'widths', 'image'
         ]
 
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
 
 class CartItemSerializer(serializers.ModelSerializer): # Информация о товаре в корзине пользователя
     variant = ProductVariantSerializer(read_only=True) # Полная информация о варианте товара(чтение)

@@ -1,17 +1,25 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 from .models import (
     Product, Grade, Surface, Width, ProductVariant,
     Cart, CartItem, Order, OrderItem, CallbackRequest,
     Session, OrderStatus
 )
 
-
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin): # Настройка для товара
-    list_display = ['name', 'category', 'is_active', 'created_at'] # Показ колонок в списке товаров
-    list_filter = ['is_active', 'category'] # Фильтры в правой части экрана
-    search_fields = ['name', 'category'] # Поиск
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ['name', 'category', 'is_active', 'image_preview', 'created_at']
+    list_filter = ['is_active', 'category']
+    search_fields = ['name', 'category']
+    fields = ['name', 'category', 'description', 'is_active', 'discount_volume', 'image', 'image_preview']
+    readonly_fields = ['image_preview']
 
+    def image_preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" width="80" height="80" style="object-fit: cover;" />')
+        return "Нет фото"
+
+    image_preview.short_description = 'Фото'
 
 @admin.register(ProductVariant)  # Настройка для варианта товара (добавляет конкретные разеры и цены)
 class ProductVariantAdmin(admin.ModelAdmin):
