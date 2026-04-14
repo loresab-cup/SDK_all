@@ -13,9 +13,15 @@ class PriceUpsertSerializer(serializers.ModelSerializer):
 
 
 from rest_framework import serializers
-from .models import (Product, ProductVariant, Cart, CartItem, Order, OrderItem, CallbackRequest, Session, Grade, Surface, Width, OrderStatus)
+from .models import (Product, ProductVariant, Cart, CartItem, Order, OrderItem, CallbackRequest, Session, Grade,
+                     Surface, Width, OrderStatus, ProductPrice)
 
-class GradeSerializer(serializers.ModelSerializer): # Преобразование сотра в json и обратно  #
+class ProductPriceSerializer(serializers.ModelSerializer): #Доска обрезная
+    class Meta:
+        model = ProductPrice
+        fields = ['id', 'grade', 'width', 'thickness', 'length', 'price']
+
+class GradeSerializer(serializers.ModelSerializer): # Преобразование сорта в json и обратно
     class Meta:
         model = Grade
         fields = ['id', 'name']

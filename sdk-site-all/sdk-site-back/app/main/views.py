@@ -36,15 +36,17 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from django.conf import settings
 from django.core.mail import send_mail
+from rest_framework import viewsets, permissions
 
 from .models import (
     Product, ProductVariant, Cart, CartItem,
-    Order, OrderItem, CallbackRequest, Session, OrderStatus
+    Order, OrderItem, CallbackRequest, Session, OrderStatus, ProductPrice
 )
+
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductVariantSerializer,
     CartSerializer, AddToCartSerializer, UpdateCartItemSerializer,
-    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer
+    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer, ProductPriceSerializer
 )
 
 
@@ -62,6 +64,20 @@ def get_or_create_session(request):
     session, _ = Session.objects.get_or_create(session_key=session_key) # Получаем сессию
     return session
 
+
+class ProductPriceViewSet(viewsets.ModelViewSet):
+    """
+    API для цен на доску обрезную.
+    GET — могут все
+    POST/PUT/DELETE — только администраторы
+    """
+    queryset = ProductPrice.objects.all()
+    serializer_class = ProductPriceSerializer
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet): # API для работы с товарами
     #ViewSet только для чтения (ReadOnly) - можно только получать данные

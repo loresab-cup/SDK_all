@@ -1,6 +1,22 @@
 from django.db import models
 from django.utils import timezone
 
+# Доска обрезная (каталог)
+class ProductPrice (models.Model):
+    """Модель для хранения цен с разными параметрами"""
+    grade = models.CharField(max_length=10, default="I", verbose_name="Сорт")
+    width = models.DecimalField(max_digits=10, decimal_places=2, default= 1, verbose_name="Ширина, мм")
+    thickness = models.DecimalField(max_digits=10, decimal_places=2, default= 1, verbose_name="Толщина, мм")
+    length = models.DecimalField(max_digits=10, decimal_places=2, default= 1, verbose_name="Длина, м")
+    price = models.DecimalField(max_digits=10, decimal_places=2, default= 0, verbose_name="Цена")
+
+    class Meta:
+        verbose_name = "Цена товара"
+        verbose_name_plural = "Цены товаров"
+
+    def __str__(self):
+        return (f"{self.grade} - {self.width}мм - {self.thickness}мм - {self.length}м - {self.price}руб")
+
 class Product (models.Model):
     name = models.CharField(max_length=100, verbose_name="Название") # Название товара (например, "Доска обрезная")
     category = models.CharField(max_length=100, verbose_name="Категория") # Категория товара (например, "Пиломатериалы")
@@ -8,7 +24,8 @@ class Product (models.Model):
     is_active = models.BooleanField(default=True, verbose_name="Активен") # Флаг активности - показывать ли товар на сайте
     # Объем от которого начинает действовать скидка (в кубометрах)
     discount_volume = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name="Объем от скидки (м³)")
-    image = models.ImageField(verbose_name="Изображение товара", upload_to="Photo", blank = True) #Изображение товара
+    # Изображение товара
+    image = models.ImageField(verbose_name="Изображение товара", upload_to="Photo", blank = True, null=True)
     # Дата создания товара в системе
     created_at = models.DateTimeField(auto_now_add=True)
 
