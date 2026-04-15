@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 from .models import (
     Product, Grade, Surface, Width, ProductVariant,
     Cart, CartItem, Order, OrderItem, CallbackRequest,
-    Session, OrderStatus, ProductPrice, WoodChips
+    Session, OrderStatus, BoardProduct, WoodChips
 )
 
 @admin.register(WoodChips)
@@ -13,24 +13,12 @@ class WoodChipsAdmin(admin.ModelAdmin):
     search_fields = ['product', 'measurement']
     list_filter = ['measurement']
 
-@admin.register(ProductPrice)
-class ProductPriceAdmin(admin.ModelAdmin):
-    list_display = ['grade', 'width', 'thickness', 'length', 'price']
-    list_filter = ['grade']
-
-    # Поля для формы редактирования
-    fields = ['grade', 'width', 'thickness', 'length', 'price']
-
-    # Действия для массового обновления
-    actions = ['activate_prices', 'deactivate_prices']
-
-    def activate_prices(self, request, queryset):
-        queryset.update(is_active=True)
-    activate_prices.short_description = "Активировать выбранные цены"
-
-    def deactivate_prices(self, request, queryset):
-        queryset.update(is_active=False)
-    deactivate_prices.short_description = "Деактивировать выбранные цены"
+@admin.register(BoardProduct)
+class BoardProductAdmin(admin.ModelAdmin):
+    list_display = ['grade', 'width', 'thickness', 'length', 'price', 'is_active']
+    list_filter = ['grade', 'is_active']
+    search_fields = ['grade', 'width', 'thickness', 'length']
+    list_editable = ['price', 'is_active']  # Можно редактировать прямо в списке
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):

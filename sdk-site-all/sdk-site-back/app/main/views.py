@@ -40,13 +40,13 @@ from rest_framework import viewsets, permissions
 
 from .models import (
     Product, ProductVariant, Cart, CartItem,
-    Order, OrderItem, CallbackRequest, Session, OrderStatus, ProductPrice, WoodChips
+    Order, OrderItem, CallbackRequest, Session, OrderStatus, BoardProduct, WoodChips
 )
 
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductVariantSerializer,
     CartSerializer, AddToCartSerializer, UpdateCartItemSerializer,
-    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer, ProductPriceSerializer,WoodChipsSerializer
+    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer, BoardProductSerializer,WoodChipsSerializer
 )
 
 
@@ -74,14 +74,14 @@ class WoodChipsViewSet(viewsets.ModelViewSet):
             return [permissions.IsAdminUser()]  # только админ
         return [permissions.AllowAny()]  # читать могут все
 
-class ProductPriceViewSet(viewsets.ModelViewSet):
+class BoardProductViewSet(viewsets.ModelViewSet):
     """
     API для цен на доску обрезную.
     GET — могут все
     POST/PUT/DELETE — только администраторы
     """
-    queryset = ProductPrice.objects.all()
-    serializer_class = ProductPriceSerializer
+    queryset = BoardProduct.objects.all()
+    serializer_class = BoardProductSerializer
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:

@@ -5,30 +5,32 @@ from django.utils import timezone
 class WoodChips (models.Model):
     product = models.CharField(max_length=50, verbose_name="Продукция")
     measurement = models.CharField(max_length=50, verbose_name="Измерение")
-    price_one = models.DecimalField(max_digits=10, decimal_places=2, default= 1, verbose_name="Цена за единицу "
-                                                                                              "продукции")
+    price_one = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена за единицу продукции")
+
     class Meta:
-        verbose_name = "Цена древесной щепы"
-        verbose_name_plural = "Цена древесной щепы"
+        verbose_name = "Древесная щепа"
+        verbose_name_plural = "Древесная щепа"
 
     def __str__(self):
-        return (f'{self.product} - {self.measurement} - {self.price_one}')
+        return f'{self.product} - {self.measurement} - {self.price_one}'
 
 # Доска обрезная (каталог)
-class ProductPrice (models.Model):
-    """Модель для хранения цен с разными параметрами"""
-    grade = models.CharField(max_length=10, default="I", verbose_name="Сорт")
-    width = models.DecimalField(max_digits=10, decimal_places=2, default= 1, verbose_name="Ширина, мм")
-    thickness = models.DecimalField(max_digits=10, decimal_places=2, default= 1, verbose_name="Толщина, мм")
-    length = models.DecimalField(max_digits=10, decimal_places=2, default= 1, verbose_name="Длина, м")
-    price = models.DecimalField(max_digits=10, decimal_places=2, default= 0, verbose_name="Цена")
+class BoardProduct(models.Model):
+    """Пиломатериал - одна строка = один товар"""
+    grade = models.CharField(max_length=50, verbose_name="Сорт")
+    width = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ширина (мм)")
+    thickness = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Толщина (мм)")
+    length = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Длина (м)")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена (руб)")
+    is_active = models.BooleanField(default=True, verbose_name="Активно")
 
     class Meta:
-        verbose_name = "Цена товара"
-        verbose_name_plural = "Цены товаров"
+        verbose_name = "Доска обрезная"
+        verbose_name_plural = "Доска обрезная"
+        ordering = ['grade', 'width', 'thickness', 'length']
 
     def __str__(self):
-        return (f"{self.grade} - {self.width}мм - {self.thickness}мм - {self.length}м - {self.price}руб")
+        return f"{self.grade} | {self.width}×{self.thickness}×{self.length}м | {self.price}₽"
 
 class Product (models.Model):
     name = models.CharField(max_length=100, verbose_name="Название") # Название товара (например, "Доска обрезная")
