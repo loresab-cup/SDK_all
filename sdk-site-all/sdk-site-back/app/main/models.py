@@ -63,11 +63,17 @@ class Width (models.Model): #ширина в мм
 
 class ProductVariant (models.Model): #Конкретный вариант товара с определенными параметрами и ценой
     # Связь с основным товаром
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variants")  # product.variants.all() - все варианты товара
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variants",
+                                verbose_name="Товар")  # product.variants.all(
+    # ) - все варианты товара
     # PROTECT означает: нельзя удалить сорт, если он используется в варианте
-    grade = models.ForeignKey(Grade, on_delete=models.PROTECT, null=True, blank=True) # Сорт конкретного варианта (может быть пустым)
-    surface = models.ForeignKey(Surface, on_delete=models.PROTECT, null=True, blank=True) # Тип поверхности этого варианта
-    width = models.ForeignKey(Width, on_delete=models.PROTECT, null=True, blank=True) # Ширина этого варианта
+    grade = models.ForeignKey(Grade, on_delete=models.PROTECT, null=True, blank=True, verbose_name="Сорт") # Сорт
+    # конкретного варианта (может быть пустым)
+    surface = models.ForeignKey(Surface, on_delete=models.PROTECT, null=True, blank=True, verbose_name="Тип "
+                                                                                                       "поверхности")#Тип поверхности этого варианта
+    width = models.ForeignKey(Width, on_delete=models.PROTECT, null=True, blank=True, verbose_name="Ширина (мм)") #
+    # Ширина
+    # этого варианта
     thickness = models.DecimalField(max_digits=6, decimal_places=1, verbose_name="Толщина (мм)") # Толщина в миллиметрах
     length = models.DecimalField(max_digits=6, decimal_places=1, verbose_name="Длина (м)") # Длина в метрах
     price_per_m3 = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Цена за м³") # Цена за кубический метр в рублях
