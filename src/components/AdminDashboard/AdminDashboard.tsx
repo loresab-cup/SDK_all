@@ -1,4 +1,5 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
+import styles from './AdminDashboard.module.css';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -9,22 +10,22 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh' }}>
-            {/* Сайдбар */}
-            <aside style={{ width: '250px', background: '#2c3e50', color: 'white', padding: '20px' }}>
-                <h3>Админ-панель</h3>
-                <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
-                    <Link to="/admin/products" style={{ color: 'white', textDecoration: 'none' }}>Товары</Link>
-                    <Link to="/admin/orders" style={{ color: 'white', textDecoration: 'none' }}>Заказы</Link>
-                    <Link to="/admin/settings" style={{ color: 'white', textDecoration: 'none' }}>Настройки сайта</Link>
+        <div className={styles.adminContainer}>
+            <aside className={styles.sidebar}>
+                <div className={styles.logo}>
+                    <h3>СДК Админ</h3>
+                </div>
+                <nav className={styles.nav}>
+                    <Link to="/admin/products" className={styles.navLink}>📦 Товары</Link>
+                    <Link to="/admin/orders" className={styles.navLink}>📋 Заказы</Link>
+                    <Link to="/admin/settings" className={styles.navLink}>⚙️ Настройки</Link>
                 </nav>
-                <button onClick={handleLogout} style={{ marginTop: '40px', padding: '8px', cursor: 'pointer' }}>
-                    Выйти
+                <button onClick={handleLogout} className={styles.logoutBtn}>
+                    🚪 Выйти
                 </button>
             </aside>
 
-            {/* Контент */}
-            <main style={{ flex: 1, padding: '20px' }}>
+            <main className={styles.content}>
                 <Outlet />
             </main>
         </div>

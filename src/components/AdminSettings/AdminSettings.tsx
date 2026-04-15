@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
+import styles from './AdminSettings.module.css';
 
-// Ключ для хранения в localStorage
 const SETTINGS_KEY = 'site_settings';
 
-// Настройки по умолчанию
 const defaultSettings = {
     phone: '+7 (888) 888-88-88',
     email: 'adress_email.ru',
@@ -17,7 +16,6 @@ const AdminSettings = () => {
     const [settings, setSettings] = useState(defaultSettings);
     const [saved, setSaved] = useState(false);
 
-    // Загружаем настройки при открытии страницы
     useEffect(() => {
         const savedSettings = localStorage.getItem(SETTINGS_KEY);
         if (savedSettings) {
@@ -38,93 +36,50 @@ const AdminSettings = () => {
     };
 
     return (
-        <div>
-            <h2>Настройки сайта</h2>
-            <p style={{ color: '#666', marginBottom: '20px' }}>
-                Здесь можно изменить контактные данные и текст, которые отображаются на всех страницах.
-            </p>
+        <div className={styles.container}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Настройки сайта</h1>
+                <p className={styles.description}>
+                    Здесь можно изменить контактные данные и текст, которые отображаются на всех страницах.
+                </p>
+            </div>
 
-            {saved && (
-                <div style={{ background: '#4caf50', color: 'white', padding: '10px', borderRadius: '4px', marginBottom: '20px' }}>
-                    ✅ Настройки сохранены!
-                </div>
-            )}
+            {saved && <div className={styles.success}>✅ Настройки сохранены!</div>}
 
-            <div style={{ display: 'grid', gap: '20px', maxWidth: '600px' }}>
-                <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Телефон</label>
-                    <input
-                        type="text"
-                        name="phone"
-                        value={settings.phone}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '8px' }}
-                    />
+            <div className={styles.form}>
+                <div className={styles.formGroup}>
+                    <label>Телефон</label>
+                    <input type="text" name="phone" value={settings.phone} onChange={handleChange} />
                 </div>
 
-                <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={settings.email}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '8px' }}
-                    />
+                <div className={styles.formGroup}>
+                    <label>Email</label>
+                    <input type="email" name="email" value={settings.email} onChange={handleChange} />
                 </div>
 
-                <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Адрес</label>
-                    <input
-                        type="text"
-                        name="address"
-                        value={settings.address}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '8px' }}
-                    />
+                <div className={styles.formGroup}>
+                    <label>Адрес</label>
+                    <input type="text" name="address" value={settings.address} onChange={handleChange} />
                 </div>
 
-                <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Режим работы</label>
-                    <input
-                        type="text"
-                        name="workHours"
-                        value={settings.workHours}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '8px' }}
-                    />
+                <div className={styles.formGroup}>
+                    <label>Режим работы</label>
+                    <input type="text" name="workHours" value={settings.workHours} onChange={handleChange} />
                 </div>
 
-                <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Текст в футере (копирайт)</label>
-                    <input
-                        type="text"
-                        name="footerText"
-                        value={settings.footerText}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '8px' }}
-                    />
+                <div className={styles.formGroup}>
+                    <label>Текст в футере (копирайт)</label>
+                    <input type="text" name="footerText" value={settings.footerText} onChange={handleChange} />
                 </div>
 
-                <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Текст в блоке "Нужна консультация?"</label>
-                    <textarea
-                        name="contactText"
-                        value={settings.contactText}
-                        onChange={handleChange}
-                        rows={3}
-                        style={{ width: '100%', padding: '8px' }}
-                    />
+                <div className={styles.formGroup}>
+                    <label>Текст в блоке "Нужна консультация?"</label>
+                    <textarea name="contactText" value={settings.contactText} onChange={handleChange} rows={3} />
                 </div>
 
-                <div>
-                    <button
-                        onClick={handleSave}
-                        style={{ padding: '10px 20px', background: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                        Сохранить настройки
-                    </button>
-                </div>
+                <button onClick={handleSave} className={styles.saveBtn}>
+                    Сохранить настройки
+                </button>
             </div>
         </div>
     );

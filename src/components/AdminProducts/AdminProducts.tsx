@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ProductFormModal from '../ProductFormModal/ProductFormModal';
+import styles from './AdminProducts.module.css';
 
 const mockProducts = [
     { id: 1, name: 'Доска обрезная 100х25', price: 150, category: 'Пиломатериалы' },
@@ -34,44 +35,44 @@ const AdminProducts = () => {
     };
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2>Управление товарами</h2>
+        <div className={styles.container}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Управление товарами</h1>
                 <button 
                     onClick={() => { setEditingProduct(null); setIsModalOpen(true); }}
-                    style={{ padding: '8px 16px', cursor: 'pointer', background: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px' }}
+                    className={styles.addBtn}
                 >
                     + Добавить товар
                 </button>
             </div>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className={styles.table}>
                 <thead>
-                    <tr style={{ background: '#f2f2f2', textAlign: 'left' }}>
-                        <th style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>ID</th>
-                        <th style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>Название</th>
-                        <th style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>Категория</th>
-                        <th style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>Цена (₽)</th>
-                        <th style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>Действия</th>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Категория</th>
+                        <th>Цена (₽)</th>
+                        <th>Действия</th>
                     </tr>
                 </thead>
                 <tbody>
                     {products.map(product => (
                         <tr key={product.id}>
-                            <td style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>{product.id}</td>
-                            <td style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>{product.name}</td>
-                            <td style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>{product.category}</td>
-                            <td style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>{product.price}</td>
-                            <td style={{ padding: '12px', borderBottom: '1px solid #ddd' }}>
+                            <td>{product.id}</td>
+                            <td>{product.name}</td>
+                            <td>{product.category}</td>
+                            <td>{product.price}</td>
+                            <td>
                                 <button 
                                     onClick={() => handleEdit(product)}
-                                    style={{ marginRight: '8px', padding: '4px 8px', cursor: 'pointer' }}
+                                    className={styles.editBtn}
                                 >
                                     ✏️
                                 </button>
                                 <button 
                                     onClick={() => handleDelete(product.id)} 
-                                    style={{ padding: '4px 8px', cursor: 'pointer', background: '#f44336', color: 'white', border: 'none', borderRadius: '4px' }}
+                                    className={styles.deleteBtn}
                                 >
                                     🗑️
                                 </button>
@@ -79,7 +80,7 @@ const AdminProducts = () => {
                         </tr>
                     ))}
                 </tbody>
-            </table>
+             </table>
 
             <ProductFormModal
                 isOpen={isModalOpen}
