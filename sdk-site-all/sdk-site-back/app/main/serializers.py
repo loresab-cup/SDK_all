@@ -14,7 +14,12 @@ class PriceUpsertSerializer(serializers.ModelSerializer):
 
 from rest_framework import serializers
 from .models import (Product, ProductVariant, Cart, CartItem, Order, OrderItem, CallbackRequest, Session, Grade,
-                     Surface, Width, OrderStatus, ProductPrice)
+                     Surface, Width, OrderStatus, ProductPrice, WoodChips)
+
+class WoodChipsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WoodChips
+        fields = ['id', 'product', 'measurement', 'price_one']
 
 class ProductPriceSerializer(serializers.ModelSerializer): #Доска обрезная
     class Meta:

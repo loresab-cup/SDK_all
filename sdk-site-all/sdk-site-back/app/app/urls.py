@@ -12,6 +12,7 @@ router.register(r'cart', views.CartViewSet, basename='cart') # viewset для к
 router.register(r'orders', views.OrderViewSet, basename='order') # viewset для заказов
 router.register(r'callbacks', views.CallbackRequestViewSet, basename='callback') # viewset для запросов
 router.register(r'prices', views.ProductPriceViewSet, basename='price')
+router.register(r'woodchips', views.WoodChipsViewSet, basename = 'woodchips')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

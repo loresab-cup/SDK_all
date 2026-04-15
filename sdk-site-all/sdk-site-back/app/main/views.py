@@ -40,13 +40,13 @@ from rest_framework import viewsets, permissions
 
 from .models import (
     Product, ProductVariant, Cart, CartItem,
-    Order, OrderItem, CallbackRequest, Session, OrderStatus, ProductPrice
+    Order, OrderItem, CallbackRequest, Session, OrderStatus, ProductPrice, WoodChips
 )
 
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductVariantSerializer,
     CartSerializer, AddToCartSerializer, UpdateCartItemSerializer,
-    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer, ProductPriceSerializer
+    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer, ProductPriceSerializer,WoodChipsSerializer
 )
 
 
@@ -64,6 +64,15 @@ def get_or_create_session(request):
     session, _ = Session.objects.get_or_create(session_key=session_key) # Получаем сессию
     return session
 
+
+class WoodChipsViewSet(viewsets.ModelViewSet):
+    queryset = WoodChips.objects.all()
+    serializer_class = WoodChipsSerializer
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]  # только админ
+        return [permissions.AllowAny()]  # читать могут все
 
 class ProductPriceViewSet(viewsets.ModelViewSet):
     """

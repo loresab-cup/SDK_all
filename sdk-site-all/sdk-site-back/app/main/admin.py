@@ -3,8 +3,15 @@ from django.utils.safestring import mark_safe
 from .models import (
     Product, Grade, Surface, Width, ProductVariant,
     Cart, CartItem, Order, OrderItem, CallbackRequest,
-    Session, OrderStatus, ProductPrice
+    Session, OrderStatus, ProductPrice, WoodChips
 )
+
+@admin.register(WoodChips)
+class WoodChipsAdmin(admin.ModelAdmin):
+    list_display = ['product', 'measurement', 'price_one']
+    list_editable = ['price_one']  # можно редактировать прямо в списке
+    search_fields = ['product', 'measurement']
+    list_filter = ['measurement']
 
 @admin.register(ProductPrice)
 class ProductPriceAdmin(admin.ModelAdmin):

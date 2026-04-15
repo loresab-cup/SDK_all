@@ -1,6 +1,19 @@
 from django.db import models
 from django.utils import timezone
 
+#Щепа древесная (каталог)
+class WoodChips (models.Model):
+    product = models.CharField(max_length=50, verbose_name="Продукция")
+    measurement = models.CharField(max_length=50, verbose_name="Измерение")
+    price_one = models.DecimalField(max_digits=10, decimal_places=2, default= 1, verbose_name="Цена за единицу "
+                                                                                              "продукции")
+    class Meta:
+        verbose_name = "Цена древесной щепы"
+        verbose_name_plural = "Цена древесной щепы"
+
+    def __str__(self):
+        return (f'{self.product} - {self.measurement} - {self.price_one}')
+
 # Доска обрезная (каталог)
 class ProductPrice (models.Model):
     """Модель для хранения цен с разными параметрами"""
