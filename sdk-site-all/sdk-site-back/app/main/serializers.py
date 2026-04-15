@@ -14,17 +14,7 @@ class PriceUpsertSerializer(serializers.ModelSerializer):
 
 from rest_framework import serializers
 from .models import (Product, ProductVariant, Cart, CartItem, Order, OrderItem, CallbackRequest, Session, Grade,
-                     Surface, Width, OrderStatus, BoardProduct, WoodChips)
-
-class WoodChipsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WoodChips
-        fields = ['id', 'product', 'measurement', 'price_one']
-
-class BoardProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BoardProduct
-        fields = ['id', 'grade', 'width', 'thickness', 'length', 'price']
+                     Surface, Width, OrderStatus)
 
 class GradeSerializer(serializers.ModelSerializer): # Преобразование сорта в json и обратно
     class Meta:

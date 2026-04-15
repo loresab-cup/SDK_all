@@ -1,37 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-#Щепа древесная (каталог)
-class WoodChips (models.Model):
-    product = models.CharField(max_length=50, verbose_name="Продукция")
-    measurement = models.CharField(max_length=50, verbose_name="Измерение")
-    price_one = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена за единицу продукции")
-
-    class Meta:
-        verbose_name = "Древесная щепа"
-        verbose_name_plural = "Древесная щепа"
-
-    def __str__(self):
-        return f'{self.product} - {self.measurement} - {self.price_one}'
-
-# Доска обрезная (каталог)
-class BoardProduct(models.Model):
-    """Пиломатериал - одна строка = один товар"""
-    grade = models.CharField(max_length=50, verbose_name="Сорт")
-    width = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ширина (мм)")
-    thickness = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Толщина (мм)")
-    length = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Длина (м)")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена (руб)")
-    is_active = models.BooleanField(default=True, verbose_name="Активно")
-
-    class Meta:
-        verbose_name = "Доска обрезная"
-        verbose_name_plural = "Доска обрезная"
-        ordering = ['grade', 'width', 'thickness', 'length']
-
-    def __str__(self):
-        return f"{self.grade} | {self.width}×{self.thickness}×{self.length}м | {self.price}₽"
-
 class Product (models.Model):
     name = models.CharField(max_length=100, verbose_name="Название") # Название товара (например, "Доска обрезная")
     category = models.CharField(max_length=100, verbose_name="Категория") # Категория товара (например, "Пиломатериалы")
@@ -102,7 +71,8 @@ class ProductVariant (models.Model): #Конкретный вариант тов
     thickness = models.DecimalField(max_digits=6, decimal_places=1, verbose_name="Толщина (мм)") # Толщина в миллиметрах
     length = models.DecimalField(max_digits=6, decimal_places=1, verbose_name="Длина (м)") # Длина в метрах
     price_per_m3 = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Цена за м³") # Цена за кубический метр в рублях
-    sheets_per_pack = models.PositiveIntegerField(verbose_name="Листов в пачке",default=1) # Сколько листов/досок в одной пачке
+    sheets_per_pack = models.PositiveIntegerField(verbose_name="Количество листов в упаковке (шт)",default=1) # Сколько
+    # листов/досок в одной пачке
     is_active = models.BooleanField(default=True, verbose_name="Активен") # Активен ли этот вариант (показывать на сайте или нет)
 
     created_at = models.DateTimeField(auto_now_add=True)

@@ -40,13 +40,13 @@ from rest_framework import viewsets, permissions
 
 from .models import (
     Product, ProductVariant, Cart, CartItem,
-    Order, OrderItem, CallbackRequest, Session, OrderStatus, BoardProduct, WoodChips
+    Order, OrderItem, CallbackRequest, Session, OrderStatus
 )
 
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductVariantSerializer,
     CartSerializer, AddToCartSerializer, UpdateCartItemSerializer,
-    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer, BoardProductSerializer,WoodChipsSerializer
+    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer
 )
 
 
@@ -63,30 +63,6 @@ def get_or_create_session(request):
 
     session, _ = Session.objects.get_or_create(session_key=session_key) # Получаем сессию
     return session
-
-
-class WoodChipsViewSet(viewsets.ModelViewSet):
-    queryset = WoodChips.objects.all()
-    serializer_class = WoodChipsSerializer
-
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAdminUser()]  # только админ
-        return [permissions.AllowAny()]  # читать могут все
-
-class BoardProductViewSet(viewsets.ModelViewSet):
-    """
-    API для цен на доску обрезную.
-    GET — могут все
-    POST/PUT/DELETE — только администраторы
-    """
-    queryset = BoardProduct.objects.all()
-    serializer_class = BoardProductSerializer
-
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet): # API для работы с товарами
     #ViewSet только для чтения (ReadOnly) - можно только получать данные
