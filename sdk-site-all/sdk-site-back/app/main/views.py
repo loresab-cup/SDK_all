@@ -40,13 +40,13 @@ from rest_framework import viewsets, permissions
 
 from .models import (
     Product, ProductVariant, Cart, CartItem,
-    Order, OrderItem, CallbackRequest, Session, OrderStatus
+    Order, OrderItem, CallbackRequest, Session, OrderStatus, CarouselSection
 )
 
 from .serializers import (
     ProductListSerializer, ProductDetailSerializer, ProductVariantSerializer,
     CartSerializer, AddToCartSerializer, UpdateCartItemSerializer,
-    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer
+    OrderSerializer, CreateOrderSerializer, CallbackRequestSerializer, CarouselSectionSerializer
 )
 
 
@@ -63,6 +63,10 @@ def get_or_create_session(request):
 
     session, _ = Session.objects.get_or_create(session_key=session_key) # Получаем сессию
     return session
+
+class CarouselSectionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = CarouselSection.objects.filter(is_active=True).order_by('created_at')
+    serializer_class = CarouselSectionSerializer
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet): # API для работы с товарами
     #ViewSet только для чтения (ReadOnly) - можно только получать данные

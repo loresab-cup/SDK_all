@@ -14,7 +14,18 @@ class PriceUpsertSerializer(serializers.ModelSerializer):
 
 from rest_framework import serializers
 from .models import (Product, ProductVariant, Cart, CartItem, Order, OrderItem, CallbackRequest, Session, Grade,
-                     Surface, Width, OrderStatus)
+                     Surface, Width, OrderStatus, CarouselSection)
+
+class CarouselSectionSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    class Meta:
+        model = CarouselSection
+        fields = ['id', 'image', 'created_at', 'is_active']
+
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
 
 class GradeSerializer(serializers.ModelSerializer): # Преобразование сорта в json и обратно
     class Meta:

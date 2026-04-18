@@ -1,6 +1,16 @@
 from django.db import models
 from django.utils import timezone
 
+class CarouselSection(models.Model):
+    image = models.ImageField(verbose_name="Фото слайда", upload_to="Photo/slides", blank = True, null=True)
+    # Дата создания товара в системе
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name = "Дата создания")
+    is_active = models.BooleanField(default=True, verbose_name="Активен") # Флаг активности - показывать ли товар на сайте
+
+    class Meta:
+        verbose_name = "Карусель"
+        verbose_name_plural = "Карусель"
+
 class Product (models.Model):
     name = models.CharField(max_length=100, verbose_name="Название") # Название товара (например, "Доска обрезная")
     category = models.CharField(max_length=100, verbose_name="Категория") # Категория товара (например, "Пиломатериалы")
@@ -9,9 +19,9 @@ class Product (models.Model):
     # Объем от которого начинает действовать скидка (в кубометрах)
     discount_volume = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name="Объем от скидки (м³)")
     # Изображение товара
-    image = models.ImageField(verbose_name="Изображение товара", upload_to="Photo", blank = True, null=True)
+    image = models.ImageField(verbose_name="Изображение товара", upload_to="Photo/cards", blank = True, null=True)
     # Дата создания товара в системе
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name = "Дата создания")
 
     # Дата последнего обновления товара
     updated_at = models.DateTimeField(auto_now=True)
